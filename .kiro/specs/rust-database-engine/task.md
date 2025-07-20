@@ -240,9 +240,9 @@
 - [x] **3.3 GTM (シングルノード)**
   - [x] AtomicU64 ベース timestamp allocator
   - [x] Benchmark で 1M tx/s 確認
-- [ ] **3.4 2PC (Single Node)**
-  - [ ] Prepare log record 永続化
-  - [ ] Crash simulation テスト
+- [x] **3.4 2PC (Single Node)**
+  - [x] Prepare log record 永続化
+  - [x] Crash simulation テスト
 
 ### Phase 4: クエリ最適化 & 実行エンジン (MVP)
 - [ ] **4.1 論理プラン生成**
