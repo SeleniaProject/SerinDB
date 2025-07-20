@@ -41,6 +41,9 @@ impl ColumnBatch {
     }
 }
 
+#[cfg(feature = "jit")]
+pub mod jit;
+
 #[cfg(test)]
 mod tests {
     use super::*;

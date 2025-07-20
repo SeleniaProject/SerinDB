@@ -252,9 +252,9 @@
 - [x] **4.3 Vectorized Execution**
   - [x] ColumnBatch 4096 rows 実装
   - [x] SIMD filter オペレータ (AVX2)
-- [ ] **4.4 JIT Expression**
-  - [ ] Cranelift backend 統合
-  - [ ] Hotspot detection	
+- [x] **4.4 JIT Expression**
+  - [x] Cranelift backend 統合
+  - [x] Hotspot detection
 
 ### Phase 5: インデックス実装
 - [ ] **5.1 B+Tree**

@@ -6,4 +6,10 @@ authors = ["SeleniaProject <dev@example.com>"]
 license = "Apache-2.0"
 
 [dependencies]
-serde = { version = "1.0", features = ["derive"] } 
+serde = { version = "1.0", features = ["derive"] }
+cranelift-jit = { version = "0.100", optional = true }
+cranelift-module = { version = "0.100", optional = true }
+cranelift-codegen = { version = "0.100", optional = true }
+
+[features]
+jit = ["cranelift-jit", "cranelift-module", "cranelift-codegen"] 
