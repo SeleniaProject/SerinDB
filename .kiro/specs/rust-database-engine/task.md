@@ -223,9 +223,9 @@
   - [x] Write-Ahead Logging バイナリフォーマット
   - [x] グループコミット & fsync バッチ
   - [x] クラッシュリカバリユニットテスト
-- [ ] **2.4 Disk I/O (io_uring)**
-  - [ ] `tokio-uring` ベース async pread/pwrite
-  - [ ] IOPS ベンチツール作成
+- [x] **2.4 Disk I/O (io_uring)**
+  - [x] `tokio-uring` ベース async pread/pwrite
+  - [x] IOPS ベンチツール作成
 - [ ] **2.5 ストレージサブレイヤ API**
   - [ ] `StorageEngine` trait 定義
   - [ ] Mock Storage で上位テスト
