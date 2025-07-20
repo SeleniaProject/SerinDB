@@ -40,6 +40,7 @@ impl<T> VersionedTuple<T> {
 }
 
 pub mod lock;
+pub mod gtm;
 
 #[cfg(test)]
 mod tests {

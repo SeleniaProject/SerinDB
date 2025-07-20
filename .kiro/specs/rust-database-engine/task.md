@@ -237,9 +237,9 @@
 - [x] **3.2 ロックマネージャ**
   - [x] Intention lock table 実装
   - [x] Deadlock detector (Wait-For Graph BFS)
-- [ ] **3.3 GTM (シングルノード)**
-  - [ ] AtomicU64 ベース timestamp allocator
-  - [ ] Benchmark で 1M tx/s 確認
+- [x] **3.3 GTM (シングルノード)**
+  - [x] AtomicU64 ベース timestamp allocator
+  - [x] Benchmark で 1M tx/s 確認
 - [ ] **3.4 2PC (Single Node)**
   - [ ] Prepare log record 永続化
   - [ ] Crash simulation テスト
