@@ -9,12 +9,15 @@ use tokio::sync::Mutex;
 use md5::{Digest, Md5};
 use crate::auth::{AuthConfig, verify_md5_password};
 use bytes::{Buf, BytesMut};
+use tracing::{info, instrument};
 
 const SSL_REQUEST_CODE: u32 = 80877103; // 0x04D2162F
 const PROTOCOL_VERSION: u32 = 196608; // 3.0
 
 /// Run a PgWire server on the given address (e.g., "0.0.0.0:5432").
+#[instrument(skip(auth_conf))]
 pub async fn run_server(addr: &str, auth_conf: Arc<AuthConfig>) -> anyhow::Result<()> {
+    info!(%addr, "Starting PgWire server");
     let listener = TcpListener::bind(addr).await?;
     println!("PgWire server listening on {addr}");
     loop {
@@ -28,6 +31,7 @@ pub async fn run_server(addr: &str, auth_conf: Arc<AuthConfig>) -> anyhow::Resul
     }
 }
 
+#[instrument(skip(socket, auth))]
 async fn handle_conn(mut socket: TcpStream, auth: Arc<AuthConfig>) -> anyhow::Result<()> {
     // Handle SSL negotiation or StartupMessage.
     let mut len_buf = [0u8; 4];

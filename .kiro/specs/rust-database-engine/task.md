@@ -321,10 +321,10 @@
   - [x] ネットワーク分断/障害注入
 
 ### Phase 8: 観測性 & 運用ツール
-- [ ] **8.1 OpenTelemetry トレース**
-  - [ ] スパン計装 (パーサ→ストレージ)
-  - [ ] gRPC OTLP Exporter
-  - [ ] サンプリング設定 (率/条件)
+- [x] **8.1 OpenTelemetry トレース**
+  - [x] スパン計装 (パーサ→ストレージ)
+  - [x] gRPC OTLP Exporter
+  - [x] サンプリング設定 (率/条件)
 - [ ] **8.2 Prometheus メトリクス**
   - [ ] Core メトリクス (QPS, latency, hit ratio)
   - [ ] Histogram バケット最適化
