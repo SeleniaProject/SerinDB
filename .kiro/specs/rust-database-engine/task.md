@@ -263,8 +263,8 @@
 - [x] **5.2 LSM Tree レベル 0-1**
   - [x] MemTable (skiplist) 実装
   - [x] SSTable writer/reader
-- [ ] **5.3 GiST / R-Tree**
-  - [ ] STR 分割アルゴリズム
+- [x] **5.3 GiST / R-Tree**
+  - [x] STR 分割アルゴリズム
 - [ ] **5.4 ブルームフィルタ**
   - [ ] MurmurHash3 実装
 

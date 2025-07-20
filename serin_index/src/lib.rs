@@ -127,6 +127,8 @@ impl BPlusTree {
     }
 }
 
+pub mod rtree;
+
 #[cfg(test)]
 mod tests {
     use super::*;
