@@ -174,10 +174,10 @@
   - [x] Cargo ワークスペース作成 (`cargo new --lib serindb`)
   - [x] `.cargo/config.toml` でターゲット設定統一
   - [x] GitHub リポジトリ作成 & 初期コミット
-- [ ] **0.2 CI/CD パイプライン**
-  - [ ] GitHub Actions ワークフロー `rust.yml` 作成
-  - [ ] Build Matrix (linux, windows, macos, arm64)
-  - [ ] `cargo test`, `clippy`, `fmt` を並列実行
+- [x] **0.2 CI/CD パイプライン**
+  - [x] GitHub Actions ワークフロー `rust.yml` 作成
+  - [x] Build Matrix (linux, windows, macos, arm64)
+  - [x] `cargo test`, `clippy`, `fmt` を並列実行
 - [ ] **0.3 コード規約 & Lint**
   - [ ] `rustfmt.toml` に max_width / edition 設定
   - [ ] `clippy.toml` で許容ルール定義
