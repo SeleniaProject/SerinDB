@@ -32,6 +32,42 @@ pub fn plan(stmt: &Statement) -> Option<LogicalPlan> {
     }
 }
 
+/// Physical plan operators.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub enum PhysicalPlan {
+    /// Sequential table scan.
+    SeqScan { table: String, cost: f64 },
+    /// Projection executed by materialization.
+    Projection { child: Box<PhysicalPlan>, cost: f64 },
+}
+
+/// Estimate cost for a logical plan and choose physical operators (very naive).
+pub fn physical_from(logical: &LogicalPlan) -> PhysicalPlan {
+    match logical {
+        LogicalPlan::Scan { table } => PhysicalPlan::SeqScan {
+            table: table.clone(),
+            cost: 100.0, // constant for MVP
+        },
+        LogicalPlan::Project { items: _, input } => {
+            let child = physical_from(input);
+            let child_cost = cost(&child);
+            PhysicalPlan::Projection {
+                child: Box::new(child),
+                cost: child_cost + 10.0,
+            }
+        }
+        _ => todo!(),
+    }
+}
+
+/// Extract cost from physical plan recursively.
+pub fn cost(plan: &PhysicalPlan) -> f64 {
+    match plan {
+        PhysicalPlan::SeqScan { cost, .. } => *cost,
+        PhysicalPlan::Projection { cost, .. } => *cost,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -46,5 +82,19 @@ mod tests {
         } else {
             panic!("expected project plan");
         }
+    }
+}
+
+#[cfg(test)]
+mod phys_tests {
+    use super::*;
+    use serin_parser::parse;
+
+    #[test]
+    fn select_physical_plan() {
+        let ast = parse("SELECT 1;").unwrap();
+        let logical = plan(&ast).unwrap();
+        let phys = physical_from(&logical);
+        assert!(cost(&phys) > 0.0);
     }
 } 
