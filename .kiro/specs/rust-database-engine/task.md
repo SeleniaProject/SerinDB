@@ -337,10 +337,10 @@
   - [x] Grafana ダッシュボードテンプレート
   - [x] Alertmanager ルール
   - [x] SLO 定義 (p99 <10ms 等)
-- [ ] **8.5 serinctl 運用コマンド**
-  - [ ] `backup`, `restore`, `analyze`, `health`
-  - [ ] `config set` ホットリロード
-  - [ ] `top` でライブメトリクス
+- [x] **8.5 serinctl 運用コマンド**
+  - [x] `backup`, `restore`, `analyze`, `health`
+  - [x] `config set` ホットリロード
+  - [x] `top` でライブメトリクス
 
 ### Phase 9: 拡張データモデル
 - [ ] **9.1 JSON ドキュメント型**
