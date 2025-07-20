@@ -1,5 +1,5 @@
 //! Simple in-memory connection pool for SerinDB PgWire connections.
-use std::collections::VecDeque;
+use std::collections::{VecDeque, HashMap};
 use std::net::SocketAddr;
 use std::time::{Duration, Instant};
 use tokio::net::TcpStream;
@@ -56,5 +56,53 @@ impl ConnectionPool {
         tokio::spawn(async move {
             if let Err(e) = server.await { eprintln!("readyz server error: {e}"); }
         });
+    }
+}
+
+pub struct StatementCache {
+    cap: usize,
+    map: Mutex<HashMap<String, String>>, // key->sql
+    order: Mutex<VecDeque<String>>, // LRU order
+}
+
+impl StatementCache {
+    pub fn new(cap: usize) -> Self {
+        Self { cap, map: Mutex::new(HashMap::new()), order: Mutex::new(VecDeque::new()) }
+    }
+
+    pub async fn get(&self, key: &str) -> Option<String> {
+        let mut ord = self.order.lock().await;
+        if let Some(pos) = ord.iter().position(|k| k == key) {
+            let k = ord.remove(pos).unwrap();
+            ord.push_back(k.clone());
+        }
+        self.map.lock().await.get(key).cloned()
+    }
+
+    pub async fn put(&self, key: String, sql: String) {
+        let mut map = self.map.lock().await;
+        let mut ord = self.order.lock().await;
+        if !map.contains_key(&key) && map.len() == self.cap {
+            if let Some(old) = ord.pop_front() { map.remove(&old); }
+        }
+        map.insert(key.clone(), sql);
+        ord.retain(|k| k != &key);
+        ord.push_back(key);
+    }
+}
+
+// Round-robin balancer
+pub struct RoundRobin {
+    backends: Vec<String>,
+    idx: Mutex<usize>,
+}
+
+impl RoundRobin {
+    pub fn new(backends: Vec<String>) -> Self { Self { backends, idx: Mutex::new(0) } }
+    pub async fn next(&self) -> String {
+        let mut i = self.idx.lock().await;
+        let addr = self.backends[*i].clone();
+        *i = (*i + 1) % self.backends.len();
+        addr
     }
 } 
