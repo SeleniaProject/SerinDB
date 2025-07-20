@@ -13,6 +13,9 @@ pub mod uring;
 pub mod engine;
 pub mod lsm;
 
+/// Time-series columnar storage (Phase 9.3).
+pub mod timeseries;
+
 /// Default page size (bytes).
 pub const PAGE_SIZE: usize = 16 * 1024; // 16 KiB
 

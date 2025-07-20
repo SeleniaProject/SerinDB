@@ -353,11 +353,11 @@
   - [x] Cypher パーサ & プランナー
   - [x] グラフトラバーサル演算子
   - [x] グラフインデックス (AdjacencyList)
-- [ ] **9.3 時系列ストレージ**
-  - [ ] 列指向チャンクライター
-  - [ ] Delta + Gorilla 圧縮
-  - [ ] Time-bucketing インデックス
-  - [ ] Continuous Aggregate ビュー
+- [x] **9.3 時系列ストレージ**
+  - [x] 列指向チャンクライター
+  - [x] Delta + Gorilla 圧縮
+  - [x] Time-bucketing インデックス
+  - [x] Continuous Aggregate ビュー
 - [ ] **9.4 ベクトル検索**
   - [ ] HNSW インデックス builder
   - [ ] KNN オペレータ & プランノード

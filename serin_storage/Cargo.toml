@@ -14,6 +14,7 @@ tokio-uring = { version = "0.4", optional = true }
 async-trait = "0.1"
 thiserror = "1"
 skiplist = "0.4"
+bitvec = "1.0" # for Gorilla bit-packing
 
 [features]
 uring = ["tokio-uring"] 
