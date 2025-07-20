@@ -13,6 +13,7 @@ tokio = { version = "1", features = ["rt", "macros"] }
 tokio-uring = { version = "0.4", optional = true }
 async-trait = "0.1"
 thiserror = "1"
+skiplist = "0.4"
 
 [features]
 uring = ["tokio-uring"] 

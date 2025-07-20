@@ -260,9 +260,9 @@
 - [x] **5.1 B+Tree**
   - [x] Split/Merge 操作
   - [x] BulkLoad ユーティリティ
-- [ ] **5.2 LSM Tree レベル 0-1**
-  - [ ] MemTable (skiplist) 実装
-  - [ ] SSTable writer/reader
+- [x] **5.2 LSM Tree レベル 0-1**
+  - [x] MemTable (skiplist) 実装
+  - [x] SSTable writer/reader
 - [ ] **5.3 GiST / R-Tree**
   - [ ] STR 分割アルゴリズム
 - [ ] **5.4 ブルームフィルタ**
