@@ -1,0 +1,4 @@
+target/
+.kiro/
+.vscode/
+.cursor/
