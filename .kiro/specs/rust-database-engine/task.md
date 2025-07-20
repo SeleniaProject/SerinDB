@@ -215,10 +215,10 @@
   - [x] `PageHeader`, `TupleSlot` 構造体
   - [x] CRC32C 検証関数
   - [x] 可変長データスロット実装
-- [ ] **2.2 Buffer Manager 2Q**
-  - [ ] A1in/A1out/Am リスト構造
-  - [ ] CLOCK ハンド victim 選定ロジック
-  - [ ] NUMA-aware アロケータ検証
+- [x] **2.2 Buffer Manager 2Q**
+  - [x] A1in/A1out/Am リスト構造
+  - [x] CLOCK ハンド victim 選定ロジック
+  - [x] NUMA-aware アロケータ検証
 - [ ] **2.3 WAL Writer**
   - [ ] Write-Ahead Logging バイナリフォーマット
   - [ ] グループコミット & fsync バッチ

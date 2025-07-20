@@ -4,6 +4,8 @@
 use crc32c::crc32c;
 use serde::{Deserialize, Serialize};
 
+pub mod buffer;
+
 /// Default page size (bytes).
 pub const PAGE_SIZE: usize = 16 * 1024; // 16 KiB
 
