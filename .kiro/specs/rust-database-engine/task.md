@@ -249,9 +249,9 @@
   - [x] SELECT/WHERE push-down optimizer pass
 - [x] **4.2 物理プラン決定**
   - [x] Cost model 関数実装 (CPU/IO)
-- [ ] **4.3 Vectorized Execution**
-  - [ ] ColumnBatch 4096 rows 実装
-  - [ ] SIMD filter オペレータ (AVX2)
+- [x] **4.3 Vectorized Execution**
+  - [x] ColumnBatch 4096 rows 実装
+  - [x] SIMD filter オペレータ (AVX2)
 - [ ] **4.4 JIT Expression**
   - [ ] Cranelift backend 統合
   - [ ] Hotspot detection	
