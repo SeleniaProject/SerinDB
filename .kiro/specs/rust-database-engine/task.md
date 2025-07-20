@@ -198,10 +198,10 @@
 - [x] **1.2 AST 定義**
   - [x] `Expr`, `Stmt`, `DataType` Enum 設計
   - [x] Serde でデバッグ表示実装
-- [ ] **1.3 SQL Parser**
-  - [ ] Antlr4 grammar 生成スクリプト
-  - [ ] エラーリカバリ (panic / resume) 実装
-  - [ ] パーサー fuzz テスト
+- [x] **1.3 SQL Parser**
+  - [x] Antlr4 grammar 生成スクリプト
+  - [x] エラーリカバリ (panic / resume) 実装
+  - [x] パーサー fuzz テスト
 - [ ] **1.4 拡張構文 (Cypher, JSON)**
   - [ ] Cypher grammar 追加
   - [ ] JSONPath サポート

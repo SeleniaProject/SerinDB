@@ -7,6 +7,10 @@ mod ast;
 pub use token::{Token, Lexer};
 pub use ast::*;
 
+pub mod parser;
+
+pub use parser::{parse, ParseError};
+
 #[cfg(test)]
 mod tests {
     use super::*;

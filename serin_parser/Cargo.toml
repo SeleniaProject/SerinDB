@@ -8,4 +8,7 @@ license = "Apache-2.0"
 [dependencies]
 logos = "0.13"
 serde = { version = "1.0", features = ["derive"] }
-thiserror = "1" 
+thiserror = "1"
+
+[features]
+antlr4 = [] 
