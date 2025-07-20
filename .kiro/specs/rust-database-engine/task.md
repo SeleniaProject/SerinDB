@@ -278,9 +278,9 @@
   - [x] TLS ネゴシエーション (SSLRequest)
 - [x] **6.2 認証方式**
   - [x] パスワード(MD5) 認証実装
-  - [ ] SCRAM-SHA-256 認証
-  - [ ] 認証設定 YAML 読み込み
-  - [ ] 不正アクセス試験ケース
+  - [x] SCRAM-SHA-256 認証
+  - [x] 認証設定 YAML 読み込み
+  - [x] 不正アクセス試験ケース
 - [ ] **6.3 ドライバ SDK**
   - [ ] Rust (`serin-rs`) tokio-postgres ラッパー
   - [ ] Go (`serin-go`) database/sql Driver

@@ -8,6 +8,9 @@ use hmac::{Hmac, Mac};
 use md5::{Digest, Md5};
 use serde::Deserialize;
 use sha2::Sha256;
+use pbkdf2::pbkdf2_hmac;
+use base64::{engine::general_purpose, Engine as _};
+use rand::{RngCore, rngs::OsRng};
 
 type HmacSha256 = Hmac<Sha256>;
 
@@ -60,4 +63,55 @@ pub fn scram_server_key(password: &str, salt: &[u8], iterations: u32) -> Vec<u8>
         for (o, u) in output.iter_mut().zip(ui.iter()) { *o ^= u; }
     }
     output.to_vec()
+}
+
+pub struct ScramCred {
+    pub salted_password: Vec<u8>,
+    pub salt: Vec<u8>,
+    pub iterations: u32,
+}
+
+pub fn build_scram_credentials(password: &str, iterations: u32) -> ScramCred {
+    let mut salt = vec![0u8; 16];
+    OsRng.fill_bytes(&mut salt);
+    let salted = derive_salted_password(password, &salt, iterations);
+    ScramCred { salted_password: salted, salt, iterations }
+}
+
+pub fn derive_salted_password(password: &str, salt: &[u8], iterations: u32) -> Vec<u8> {
+    let mut out = [0u8; 32];
+    pbkdf2_hmac::<Sha256>(password.as_bytes(), salt, iterations, &mut out);
+    out.to_vec()
+}
+
+pub fn client_key(salted: &[u8]) -> Vec<u8> {
+    let mut mac = HmacSha256::new_from_slice(salted).unwrap();
+    mac.update(b"Client Key");
+    mac.finalize().into_bytes().to_vec()
+}
+
+pub fn stored_key(client_key: &[u8]) -> Vec<u8> {
+    let mut hasher = Sha256::new();
+    hasher.update(client_key);
+    hasher.finalize().to_vec()
+}
+
+pub fn server_key(salted: &[u8]) -> Vec<u8> {
+    let mut mac = HmacSha256::new_from_slice(salted).unwrap();
+    mac.update(b"Server Key");
+    mac.finalize().into_bytes().to_vec()
+}
+
+pub fn base64_encode(data: &[u8]) -> String { general_purpose::STANDARD.encode(data) } 
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn md5_invalid_password() {
+        let salt = [1u8, 2, 3, 4];
+        let ok = verify_md5_password("secret", "alice", "md5deadbeef", &salt);
+        assert!(!ok);
+    }
 } 
