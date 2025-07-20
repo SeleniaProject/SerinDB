@@ -226,9 +226,9 @@
 - [x] **2.4 Disk I/O (io_uring)**
   - [x] `tokio-uring` ベース async pread/pwrite
   - [x] IOPS ベンチツール作成
-- [ ] **2.5 ストレージサブレイヤ API**
-  - [ ] `StorageEngine` trait 定義
-  - [ ] Mock Storage で上位テスト
+- [x] **2.5 ストレージサブレイヤ API**
+  - [x] `StorageEngine` trait 定義
+  - [x] Mock Storage で上位テスト
 
 ### Phase 3: トランザクションマネージャ
 - [ ] **3.1 MVCC スナップショット**

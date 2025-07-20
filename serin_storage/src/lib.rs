@@ -10,6 +10,8 @@ pub mod wal;
 #[cfg(feature = "uring")]
 pub mod uring;
 
+pub mod engine;
+
 /// Default page size (bytes).
 pub const PAGE_SIZE: usize = 16 * 1024; // 16 KiB
 
