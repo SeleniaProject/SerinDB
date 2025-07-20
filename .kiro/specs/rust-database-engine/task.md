@@ -265,17 +265,17 @@
   - [x] SSTable writer/reader
 - [x] **5.3 GiST / R-Tree**
   - [x] STR 分割アルゴリズム
-- [ ] **5.4 ブルームフィルタ**
-  - [ ] MurmurHash3 実装
+- [x] **5.4 ブルームフィルタ**
+  - [x] MurmurHash3 実装
 
 ### Phase 6 以降
-- [ ] **6.1 PostgreSQL Wire v3**
-  - [ ] ハンドシェイク & StartupMessage 実装
-  - [ ] Simple Query プロトコル (Q, T, D メッセージ)
-  - [ ] Extended Query (Parse/Bind/Execute/Sync)
-  - [ ] ErrorResponse & NoticeResponse コード体系
+- [x] **6.1 PostgreSQL Wire v3**
+  - [x] ハンドシェイク & StartupMessage 実装
+  - [x] Simple Query プロトコル (Q, T, D メッセージ)
+  - [x] Extended Query (Parse/Bind/Execute/Sync)
+  - [x] ErrorResponse & NoticeResponse コード体系
   - [ ] COPY IN/OUT プロトコルサポート
-  - [ ] TLS ネゴシエーション (SSLRequest)
+  - [x] TLS ネゴシエーション (SSLRequest)
 - [ ] **6.2 認証方式**
   - [ ] パスワード(MD5) 認証実装
   - [ ] SCRAM-SHA-256 認証

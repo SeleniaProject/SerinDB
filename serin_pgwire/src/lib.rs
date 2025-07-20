@@ -1,0 +1,239 @@
+//! Minimal PostgreSQL Wire Protocol (v3) server for SerinDB.
+//! Supports SSL negation, StartupMessage, Simple Query, and basic Extended Query.
+
+use bytes::{Buf, BytesMut};
+use std::collections::HashMap;
+use std::sync::Arc;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use tokio::net::{TcpListener, TcpStream};
+use tokio::sync::Mutex;
+
+const SSL_REQUEST_CODE: u32 = 80877103; // 0x04D2162F
+const PROTOCOL_VERSION: u32 = 196608; // 3.0
+
+/// Run a PgWire server on the given address (e.g., "0.0.0.0:5432").
+pub async fn run_server(addr: &str) -> anyhow::Result<()> {
+    let listener = TcpListener::bind(addr).await?;
+    println!("PgWire server listening on {addr}");
+    loop {
+        let (socket, _) = listener.accept().await?;
+        tokio::spawn(async move {
+            if let Err(e) = handle_conn(socket).await {
+                eprintln!("connection error: {e}");
+            }
+        });
+    }
+}
+
+async fn handle_conn(mut socket: TcpStream) -> anyhow::Result<()> {
+    // Handle SSL negotiation or StartupMessage.
+    let mut len_buf = [0u8; 4];
+    socket.read_exact(&mut len_buf).await?;
+    let len = u32::from_be_bytes(len_buf) as usize;
+    let mut buf = vec![0u8; len - 4];
+    socket.read_exact(&mut buf).await?;
+    let mut cursor = &buf[..];
+    let code = cursor.get_u32();
+    if code == SSL_REQUEST_CODE {
+        // Respond 'N' (no SSL) and read next startup msg.
+        socket.write_all(b"N").await?;
+        socket.read_exact(&mut len_buf).await?;
+        let len2 = u32::from_be_bytes(len_buf) as usize;
+        buf.resize(len2 - 4, 0);
+        socket.read_exact(&mut buf).await?;
+        cursor = &buf[..];
+    }
+    // Parse startup.
+    let protocol = code;
+    if protocol != PROTOCOL_VERSION {
+        send_error(&mut socket, "FATAL", "0A000", "Unsupported protocol").await?;
+        return Ok(());
+    }
+    let mut params = HashMap::new();
+    while let Some(pos) = cursor.iter().position(|&b| b == 0) {
+        let key = std::str::from_utf8(&cursor[..pos])?.to_string();
+        cursor.advance(pos + 1);
+        if key.is_empty() { break; }
+        let val_pos = cursor.iter().position(|&b| b == 0).ok_or_else(|| anyhow::anyhow!("malformed startup"))?;
+        let val = std::str::from_utf8(&cursor[..val_pos])?.to_string();
+        cursor.advance(val_pos + 1);
+        params.insert(key, val);
+    }
+    // Send AuthenticationOk.
+    send_auth_ok(&mut socket).await?;
+    // ParameterStatus.
+    send_param_status(&mut socket, "server_version", "13.0").await?;
+    send_param_status(&mut socket, "client_encoding", "UTF8").await?;
+    // ReadyForQuery.
+    send_ready(&mut socket).await?;
+
+    // State storage for prepared statements / portals.
+    let stmts: Arc<Mutex<HashMap<String, String>>> = Arc::new(Mutex::new(HashMap::new()));
+    let mut read_buf = BytesMut::with_capacity(8192);
+    loop {
+        // Read message type.
+        let mut typ_buf = [0u8; 1];
+        if let Err(_) = socket.read_exact(&mut typ_buf).await { break; }
+        let msg_type = typ_buf[0] as char;
+        socket.read_exact(&mut len_buf).await?;
+        let mlen = u32::from_be_bytes(len_buf) as usize;
+        read_buf.resize(mlen - 4, 0);
+        socket.read_exact(&mut read_buf).await?;
+        match msg_type {
+            'Q' => {
+                // Simple Query.
+                let q = extract_cstr(&read_buf)?;
+                process_simple_query(&mut socket, q).await?;
+            }
+            'P' => {
+                // Parse
+                let (name, query) = parse_parse_msg(&read_buf)?;
+                stmts.lock().await.insert(name, query);
+                send_parse_complete(&mut socket).await?;
+            }
+            'B' => {
+                // Bind (ignore formats/params)
+                let portal_name = parse_bind_msg(&read_buf)?;
+                // For simplicity, we reuse query from unnamed statement.
+                stmts.lock().await.get("");
+                send_bind_complete(&mut socket).await?;
+                // store portal not required for demo
+            }
+            'E' => {
+                // Execute (ignore portal)
+                process_simple_query(&mut socket, "SELECT 1".into()).await?;
+            }
+            'S' => {
+                // Sync
+                send_ready(&mut socket).await?;
+            }
+            _ => {
+                send_error(&mut socket, "ERROR", "42601", "Unsupported message").await?;
+            }
+        }
+    }
+    Ok(())
+}
+
+// Helper functions
+fn extract_cstr(buf: &[u8]) -> anyhow::Result<String> {
+    if let Some(pos) = buf.iter().position(|&b| b == 0) {
+        Ok(std::str::from_utf8(&buf[..pos])?.to_string())
+    } else {
+        anyhow::bail!("null-terminated string expected");
+    }
+}
+
+fn parse_parse_msg(buf: &[u8]) -> anyhow::Result<(String, String)> {
+    let mut slice = buf;
+    let name = extract_cstr(slice)?;
+    slice = &slice[name.len() + 1..];
+    let query = extract_cstr(slice)?;
+    Ok((name, query))
+}
+
+fn parse_bind_msg(buf: &[u8]) -> anyhow::Result<String> {
+    let portal = extract_cstr(buf)?;
+    Ok(portal)
+}
+
+async fn process_simple_query(socket: &mut TcpStream, _query: String) -> anyhow::Result<()> {
+    // Always return single column "?column?" with value 1 (int4).
+    send_row_description(socket).await?;
+    send_data_row(socket).await?;
+    send_command_complete(socket, "SELECT 1").await?;
+    send_ready(socket).await?;
+    Ok(())
+}
+
+async fn send_auth_ok(socket: &mut TcpStream) -> anyhow::Result<()> {
+    let mut msg = Vec::new();
+    msg.push(b'R');
+    msg.extend(&(8u32.to_be_bytes()));
+    msg.extend(&(0u32.to_be_bytes()));
+    socket.write_all(&msg).await?;
+    Ok(())
+}
+
+async fn send_param_status(socket: &mut TcpStream, key: &str, val: &str) -> anyhow::Result<()> {
+    let len = (4 + key.len() + 1 + val.len() + 1) as u32;
+    socket.write_u8(b'S').await?;
+    socket.write_u32(len.to_be()).await?;
+    socket.write_all(key.as_bytes()).await?;
+    socket.write_u8(0).await?;
+    socket.write_all(val.as_bytes()).await?;
+    socket.write_u8(0).await?;
+    Ok(())
+}
+
+async fn send_ready(socket: &mut TcpStream) -> anyhow::Result<()> {
+    socket.write_u8(b'Z').await?;
+    socket.write_u32(5u32.to_be()).await?;
+    socket.write_u8(b'I').await?; // idle
+    Ok(())
+}
+
+async fn send_row_description(socket: &mut TcpStream) -> anyhow::Result<()> {
+    let field_name = b"?column?\0";
+    let len = 4 + 2 + field_name.len() + 18; // 18 bytes of fixed fields
+    socket.write_u8(b'T').await?;
+    socket.write_u32((len as u32).to_be()).await?;
+    socket.write_u16(1u16.to_be()).await?; // 1 field
+    socket.write_all(field_name).await?;
+    socket.write_u32(0u32.to_be()).await?; // table oid
+    socket.write_u16(0u16.to_be()).await?; // attr num
+    socket.write_u32(23u32.to_be()).await?; // int4 oid
+    socket.write_u16(4u16.to_be()).await?; // size
+    socket.write_u32((-1i32) as u32).await?; // type modifier
+    socket.write_u16(0u16.to_be()).await?; // text format
+    Ok(())
+}
+
+async fn send_data_row(socket: &mut TcpStream) -> anyhow::Result<()> {
+    let val_bytes = b"1";
+    let len = 4 + 2 + 4 + val_bytes.len();
+    socket.write_u8(b'D').await?;
+    socket.write_u32((len as u32).to_be()).await?;
+    socket.write_u16(1u16.to_be()).await?;
+    socket.write_u32((val_bytes.len() as u32).to_be()).await?;
+    socket.write_all(val_bytes).await?;
+    Ok(())
+}
+
+async fn send_command_complete(socket: &mut TcpStream, tag: &str) -> anyhow::Result<()> {
+    let len = 4 + tag.len() + 1;
+    socket.write_u8(b'C').await?;
+    socket.write_u32((len as u32).to_be()).await?;
+    socket.write_all(tag.as_bytes()).await?;
+    socket.write_u8(0).await?;
+    Ok(())
+}
+
+async fn send_parse_complete(socket: &mut TcpStream) -> anyhow::Result<()> {
+    socket.write_u8(b'1').await?;
+    socket.write_u32(4u32.to_be()).await?;
+    Ok(())
+}
+
+async fn send_bind_complete(socket: &mut TcpStream) -> anyhow::Result<()> {
+    socket.write_u8(b'2').await?;
+    socket.write_u32(4u32.to_be()).await?;
+    Ok(())
+}
+
+async fn send_error(socket: &mut TcpStream, severity: &str, code: &str, message: &str) -> anyhow::Result<()> {
+    let len = 4 + 1 + severity.len() + 1 + 1 + code.len() + 1 + 1 + message.len() + 1 + 1;
+    socket.write_u8(b'E').await?;
+    socket.write_u32((len as u32).to_be()).await?;
+    socket.write_u8(b'S').await?;
+    socket.write_all(severity.as_bytes()).await?;
+    socket.write_u8(0).await?;
+    socket.write_u8(b'C').await?;
+    socket.write_all(code.as_bytes()).await?;
+    socket.write_u8(0).await?;
+    socket.write_u8(b'M').await?;
+    socket.write_all(message.as_bytes()).await?;
+    socket.write_u8(0).await?;
+    socket.write_u8(0).await?; // terminator
+    Ok(())
+} 

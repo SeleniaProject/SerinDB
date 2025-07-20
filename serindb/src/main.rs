@@ -1,4 +1,5 @@
 use clap::{Parser, Subcommand};
+use tokio::runtime::Runtime;
 
 /// SerinDB command-line interface (MVP).
 #[derive(Parser)]
@@ -13,6 +14,13 @@ struct Cli {
 enum Commands {
     /// Run health check and exit.
     HealthCheck,
+
+    /// Start PostgreSQL Wire server.
+    Server {
+        /// Listen address (e.g., 0.0.0.0:5432)
+        #[arg(long, default_value = "0.0.0.0:5432")]
+        listen: String,
+    },
 }
 
 fn main() {
@@ -26,8 +34,17 @@ fn main() {
                 println!("FAILED");
             }
         }
+        Some(Commands::Server { listen }) => {
+            // Start async runtime manually since main is sync.
+            let rt = Runtime::new().unwrap();
+            rt.block_on(async {
+                if let Err(e) = serin_pgwire::run_server(&listen).await {
+                    eprintln!("Server error: {e}");
+                }
+            });
+        }
         None => {
-            // Default behavior: print help (handled by clap auto) if no subcommand
+            // Clap will print help.
         }
     }
 } 

@@ -128,6 +128,7 @@ impl BPlusTree {
 }
 
 pub mod rtree;
+pub mod bloom;
 
 #[cfg(test)]
 mod tests {
