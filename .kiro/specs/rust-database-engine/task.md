@@ -182,10 +182,10 @@
   - [x] `rustfmt.toml` に max_width / edition 設定
   - [x] `clippy.toml` で許容ルール定義
   - [x] `cargo-deny` でライセンス & セキュリティチェック
-- [ ] **0.4 ドキュメントサイト基盤**
-  - [ ] `mdBook` テンプレート生成
-  - [ ] GitHub Pages デプロイ Workflow 作成
-  - [ ] `design.md` & `requirements.md` を自動取り込み
+- [x] **0.4 ドキュメントサイト基盤**
+  - [x] `mdBook` テンプレート生成
+  - [x] GitHub Pages デプロイ Workflow 作成
+  - [x] `design.md` & `requirements.md` を自動取り込み
 - [ ] **0.5 コンテナビルド**
   - [ ] Multi-stage `Dockerfile` (Alpine)
   - [ ] `docker-compose.yml` に dev サービス追加

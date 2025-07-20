@@ -1,0 +1,15 @@
+[book]
+title = "SerinDB Documentation"
+author = ["SeleniaProject"]
+multilingual = false
+language = "ja"
+
+[build]
+create-missing = true
+
+directory = "book"
+
+[output.html]
+mathjax-support = true
+copy-fonts = true
+site-url = "/" 

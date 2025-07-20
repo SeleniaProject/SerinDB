@@ -1,0 +1,31 @@
+name: Publish Docs
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install mdBook
+        uses: peaceiris/actions-mdbook@v1
+        with:
+          mdbook-version: "latest"
+
+      - name: Prepare spec chapters
+        run: |
+          mkdir -p docs/src
+          cp ./.kiro/specs/rust-database-engine/requirements.md docs/src/requirements.md
+          cp ./.kiro/specs/rust-database-engine/design.md docs/src/design.md
+
+      - name: Build book
+        run: mdbook build docs
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/book 
