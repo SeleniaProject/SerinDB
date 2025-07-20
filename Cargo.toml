@@ -1,5 +1,5 @@
 [workspace]
-members = ["serindb", "serin_parser", "serinctl", "serin_storage", "serin_txn", "serin_optimizer", "serin_exec", "serin_index", "serin_pgwire", "serin_rs", "serin_pool", "serin_raft", "serin_meta", "serin_shard", "serin_rebalance", "serin_multidc", "serin_consistency", "serin_telemetry", "serin_metrics", "serin_log", "serin_json"]
+members = ["serindb", "serin_parser", "serin_parser", "serinctl", "serin_storage", "serin_txn", "serin_optimizer", "serin_exec", "serin_index", "serin_pgwire", "serin_rs", "serin_pool", "serin_raft", "serin_meta", "serin_shard", "serin_rebalance", "serin_multidc", "serin_consistency", "serin_telemetry", "serin_metrics", "serin_log", "serin_json", "serin_graph"]
 
 [profile.release]
 opt-level = 3

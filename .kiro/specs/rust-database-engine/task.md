@@ -348,11 +348,11 @@
   - [x] JSONPath 評価器
   - [x] GIN インデックス
   - [x] JSON スキーマ検証
-- [ ] **9.2 Property Graph**
-  - [ ] ノード/エッジテーブルスキーマ
-  - [ ] Cypher パーサ & プランナー
-  - [ ] グラフトラバーサル演算子
-  - [ ] グラフインデックス (AdjacencyList)
+- [x] **9.2 Property Graph**
+  - [x] ノード/エッジテーブルスキーマ
+  - [x] Cypher パーサ & プランナー
+  - [x] グラフトラバーサル演算子
+  - [x] グラフインデックス (AdjacencyList)
 - [ ] **9.3 時系列ストレージ**
   - [ ] 列指向チャンクライター
   - [ ] Delta + Gorilla 圧縮
