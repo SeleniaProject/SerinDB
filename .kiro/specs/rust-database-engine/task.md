@@ -274,7 +274,7 @@
   - [x] Simple Query プロトコル (Q, T, D メッセージ)
   - [x] Extended Query (Parse/Bind/Execute/Sync)
   - [x] ErrorResponse & NoticeResponse コード体系
-  - [ ] COPY IN/OUT プロトコルサポート
+  - [x] COPY IN/OUT プロトコルサポート
   - [x] TLS ネゴシエーション (SSLRequest)
 - [x] **6.2 認証方式**
   - [x] パスワード(MD5) 認証実装

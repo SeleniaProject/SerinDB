@@ -105,9 +105,13 @@ async fn handle_conn(mut socket: TcpStream, auth: Arc<AuthConfig>) -> anyhow::Re
         socket.read_exact(&mut read_buf).await?;
         match msg_type {
             'Q' => {
-                // Simple Query.
+                // Simple Query or COPY.
                 let q = extract_cstr(&read_buf)?;
-                process_simple_query(&mut socket, q).await?;
+                if q.trim_start().to_ascii_uppercase().starts_with("COPY") {
+                    process_copy_query(&mut socket, q).await?;
+                } else {
+                    process_simple_query(&mut socket, q).await?;
+                }
             }
             'P' => {
                 // Parse
@@ -161,12 +165,58 @@ fn parse_bind_msg(buf: &[u8]) -> anyhow::Result<String> {
     Ok(portal)
 }
 
-async fn process_simple_query(socket: &mut TcpStream, _query: String) -> anyhow::Result<()> {
-    // Always return single column "?column?" with value 1 (int4).
-    send_row_description(socket).await?;
-    send_data_row(socket).await?;
-    send_command_complete(socket, "SELECT 1").await?;
-    send_ready(socket).await?;
+async fn process_simple_query(socket: &mut TcpStream, query: String) -> anyhow::Result<()> {
+    let q_lower = query.to_lowercase();
+    if q_lower.starts_with("copy") {
+        handle_copy(socket, &q_lower).await
+    } else {
+        // Always return single column "?column?" with value 1 (int4).
+        send_row_description(socket).await?;
+        send_data_row(socket).await?;
+        send_command_complete(socket, "SELECT 1").await?;
+        send_ready(socket).await?;
+        Ok(())
+    }
+}
+
+async fn handle_copy(socket: &mut TcpStream, query: &str) -> anyhow::Result<()> {
+    if query.contains("from stdin") {
+        // COPY FROM STDIN
+        send_copy_in_response(socket).await?;
+        // Read CopyData until CopyDone
+        let mut len_buf = [0u8; 4];
+        loop {
+            let mut typ_buf = [0u8; 1];
+            socket.read_exact(&mut typ_buf).await?;
+            socket.read_exact(&mut len_buf).await?;
+            let mlen = u32::from_be_bytes(len_buf) as usize;
+            let mut discard = vec![0u8; mlen - 4];
+            socket.read_exact(&mut discard).await?;
+            match typ_buf[0] as char {
+                'd' => continue, // CopyData: ignore
+                'c' => break,     // CopyDone
+                'f' => {
+                    send_error(socket, "ERROR", "42601", "COPY failed").await?;
+                    return Ok(());
+                }
+                _ => {
+                    send_error(socket, "ERROR", "42601", "Unexpected message during COPY").await?;
+                    return Ok(());
+                }
+            }
+        }
+        send_command_complete(socket, "COPY 0").await?;
+        send_ready(socket).await?;
+    } else if query.contains("to stdout") {
+        // COPY TO STDOUT
+        send_copy_out_response(socket).await?;
+        // For demo, send no data.
+        send_copy_done(socket).await?;
+        send_command_complete(socket, "COPY 0").await?;
+        send_ready(socket).await?;
+    } else {
+        send_error(socket, "ERROR", "42601", "Unsupported COPY variant").await?;
+    }
     Ok(())
 }
 
@@ -271,6 +321,88 @@ async fn send_parse_complete(socket: &mut TcpStream) -> anyhow::Result<()> {
 async fn send_bind_complete(socket: &mut TcpStream) -> anyhow::Result<()> {
     socket.write_u8(b'2').await?;
     socket.write_u32(4u32.to_be()).await?;
+    Ok(())
+}
+
+// === COPY protocol helpers ===
+async fn send_copy_in_response(socket: &mut TcpStream) -> anyhow::Result<()> {
+    // CopyInResponse: 'G' | len | 0=text format | 0 columns
+    socket.write_u8(b'G').await?;
+    socket.write_u32(7u32.to_be()).await?; // length
+    socket.write_u8(0).await?; // text format
+    socket.write_u16(0u16.to_be()).await?; // no column-specific formats
+    Ok(())
+}
+
+async fn send_copy_out_response(socket: &mut TcpStream) -> anyhow::Result<()> {
+    // CopyOutResponse: 'H'
+    socket.write_u8(b'H').await?;
+    socket.write_u32(7u32.to_be()).await?;
+    socket.write_u8(0).await?; // text
+    socket.write_u16(0u16.to_be()).await?;
+    Ok(())
+}
+
+async fn send_copy_data(socket: &mut TcpStream, data: &[u8]) -> anyhow::Result<()> {
+    socket.write_u8(b'd').await?;
+    socket.write_u32((4 + data.len()) as u32).to_be()).await?;
+    socket.write_all(data).await?;
+    Ok(())
+}
+
+async fn send_copy_done(socket: &mut TcpStream) -> anyhow::Result<()> {
+    socket.write_u8(b'c').await?;
+    socket.write_u32(4u32.to_be()).await?;
+    Ok(())
+}
+
+async fn process_copy_query(socket: &mut TcpStream, query: String) -> anyhow::Result<()> {
+    // Extremely simplified COPY handler: supports TEXT format, STDIN/STDOUT only.
+    let upper = query.to_ascii_uppercase();
+    if upper.contains("FROM STDIN") {
+        // COPY FROM STDIN (client will send data)
+        send_copy_in_response(socket).await?;
+        // Read CopyData messages until CopyDone ('c') or CopyFail ('f').
+        loop {
+            let mut typ = [0u8; 1];
+            socket.read_exact(&mut typ).await?;
+            let mut len_buf = [0u8; 4];
+            socket.read_exact(&mut len_buf).await?;
+            let msg_len = u32::from_be_bytes(len_buf) as usize;
+            let mut discard = vec![0u8; msg_len - 4];
+            socket.read_exact(&mut discard).await?;
+            match typ[0] as char {
+                'd' => {
+                    // CopyData – ignore contents.
+                }
+                'c' => {
+                    // CopyDone – finish copy.
+                    break;
+                }
+                'f' => {
+                    // CopyFail – send error and abort.
+                    send_error(socket, "ERROR", "XX000", "COPY failed").await?;
+                    return Ok(());
+                }
+                _ => {
+                    send_error(socket, "ERROR", "08P01", "Unexpected message during COPY").await?;
+                    return Ok(());
+                }
+            }
+        }
+        send_command_complete(socket, "COPY 0").await?; // No rows for demo
+        send_ready(socket).await?;
+    } else if upper.contains("TO STDOUT") {
+        // COPY TO STDOUT – send single dummy row.
+        send_copy_out_response(socket).await?;
+        send_copy_data(socket, b"1\tserindb\n").await?;
+        send_copy_done(socket).await?;
+        send_command_complete(socket, "COPY 1").await?;
+        send_ready(socket).await?;
+    } else {
+        // Unsupported COPY variant.
+        send_error(socket, "ERROR", "0A000", "Unsupported COPY variant").await?;
+    }
     Ok(())
 }
 
