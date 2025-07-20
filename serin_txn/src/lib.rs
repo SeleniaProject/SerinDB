@@ -39,6 +39,8 @@ impl<T> VersionedTuple<T> {
     }
 }
 
+pub mod lock;
+
 #[cfg(test)]
 mod tests {
     use super::*;
