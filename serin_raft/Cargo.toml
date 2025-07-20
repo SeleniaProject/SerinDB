@@ -1,0 +1,11 @@
+[package]
+name = "serin_raft"
+version = "0.1.0"
+edition = "2021"
+authors = ["SeleniaProject <dev@example.com>"]
+license = "Apache-2.0"
+
+[dependencies]
+openraft = "0.7"
+async-trait = "0.1"
+serde = { version = "1", features = ["derive"] } 
