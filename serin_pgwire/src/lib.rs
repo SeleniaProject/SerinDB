@@ -1,8 +1,6 @@
 //! Minimal PostgreSQL Wire Protocol (v3) server for SerinDB.
 //! Supports SSL negation, StartupMessage, Simple Query, and basic Extended Query.
 
-use bytes::{Buf, BytesMut};
-pub mod auth;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -10,6 +8,7 @@ use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::Mutex;
 use md5::{Digest, Md5};
 use crate::auth::{AuthConfig, verify_md5_password};
+use bytes::{Buf, BytesMut};
 
 const SSL_REQUEST_CODE: u32 = 80877103; // 0x04D2162F
 const PROTOCOL_VERSION: u32 = 196608; // 3.0
@@ -107,11 +106,7 @@ async fn handle_conn(mut socket: TcpStream, auth: Arc<AuthConfig>) -> anyhow::Re
             'Q' => {
                 // Simple Query or COPY.
                 let q = extract_cstr(&read_buf)?;
-                if q.trim_start().to_ascii_uppercase().starts_with("COPY") {
-                    process_copy_query(&mut socket, q).await?;
-                } else {
-                    process_simple_query(&mut socket, q).await?;
-                }
+                process_simple_query(&mut socket, q).await?;
             }
             'P' => {
                 // Parse
@@ -345,7 +340,7 @@ async fn send_copy_out_response(socket: &mut TcpStream) -> anyhow::Result<()> {
 
 async fn send_copy_data(socket: &mut TcpStream, data: &[u8]) -> anyhow::Result<()> {
     socket.write_u8(b'd').await?;
-    socket.write_u32((4 + data.len()) as u32).to_be()).await?;
+    socket.write_u32(((4 + data.len()) as u32).to_be()).await?;
     socket.write_all(data).await?;
     Ok(())
 }
@@ -353,56 +348,6 @@ async fn send_copy_data(socket: &mut TcpStream, data: &[u8]) -> anyhow::Result<(
 async fn send_copy_done(socket: &mut TcpStream) -> anyhow::Result<()> {
     socket.write_u8(b'c').await?;
     socket.write_u32(4u32.to_be()).await?;
-    Ok(())
-}
-
-async fn process_copy_query(socket: &mut TcpStream, query: String) -> anyhow::Result<()> {
-    // Extremely simplified COPY handler: supports TEXT format, STDIN/STDOUT only.
-    let upper = query.to_ascii_uppercase();
-    if upper.contains("FROM STDIN") {
-        // COPY FROM STDIN (client will send data)
-        send_copy_in_response(socket).await?;
-        // Read CopyData messages until CopyDone ('c') or CopyFail ('f').
-        loop {
-            let mut typ = [0u8; 1];
-            socket.read_exact(&mut typ).await?;
-            let mut len_buf = [0u8; 4];
-            socket.read_exact(&mut len_buf).await?;
-            let msg_len = u32::from_be_bytes(len_buf) as usize;
-            let mut discard = vec![0u8; msg_len - 4];
-            socket.read_exact(&mut discard).await?;
-            match typ[0] as char {
-                'd' => {
-                    // CopyData – ignore contents.
-                }
-                'c' => {
-                    // CopyDone – finish copy.
-                    break;
-                }
-                'f' => {
-                    // CopyFail – send error and abort.
-                    send_error(socket, "ERROR", "XX000", "COPY failed").await?;
-                    return Ok(());
-                }
-                _ => {
-                    send_error(socket, "ERROR", "08P01", "Unexpected message during COPY").await?;
-                    return Ok(());
-                }
-            }
-        }
-        send_command_complete(socket, "COPY 0").await?; // No rows for demo
-        send_ready(socket).await?;
-    } else if upper.contains("TO STDOUT") {
-        // COPY TO STDOUT – send single dummy row.
-        send_copy_out_response(socket).await?;
-        send_copy_data(socket, b"1\tserindb\n").await?;
-        send_copy_done(socket).await?;
-        send_command_complete(socket, "COPY 1").await?;
-        send_ready(socket).await?;
-    } else {
-        // Unsupported COPY variant.
-        send_error(socket, "ERROR", "0A000", "Unsupported COPY variant").await?;
-    }
     Ok(())
 }
 
