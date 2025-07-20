@@ -211,10 +211,10 @@
   - [x] バッチスクリプト実行オプション `-f`
 
 ### Phase 2: ストレージエンジン基盤
-- [ ] **2.1 ページフォーマット実装**
-  - [ ] `PageHeader`, `TupleSlot` 構造体
-  - [ ] CRC32C 検証関数
-  - [ ] 可変長データスロット実装
+- [x] **2.1 ページフォーマット実装**
+  - [x] `PageHeader`, `TupleSlot` 構造体
+  - [x] CRC32C 検証関数
+  - [x] 可変長データスロット実装
 - [ ] **2.2 Buffer Manager 2Q**
   - [ ] A1in/A1out/Am リスト構造
   - [ ] CLOCK ハンド victim 選定ロジック
@@ -371,4 +371,61 @@
   - [ ] Key Envelope (KEK/DEK) 実装
   - [ ] バックグラウンド Re-Key 処理
 - [ ] **10.3 RBAC**
-  - [ ] `CREATE ROLE`, `GRANT`
+  - [ ] `CREATE ROLE`, `GRANT` 文実装
+  - [ ] 階層型権限マッピング
+- [ ] **10.4 監査ログ**
+  - [ ] Query Audit, Security Event
+  - [ ] WORM ストレージ出力
+- [ ] **10.5 鍵管理 (KMS)**
+  - [ ] Hashicorp Vault プラグイン
+  - [ ] AWS KMS / GCP KMS プラグイン
+
+### Phase 11: 国際化 / ローカライゼーション
+- [ ] **11.1 ICU4X 統合**
+  - [ ] 数値/日付/通貨フォーマッタ
+  - [ ] ロケール判定 API
+- [ ] **11.2 Fluent メッセージカタログ**
+  - [ ] `.ftl` ローダ
+  - [ ] フォールバックチェイン
+- [ ] **11.3 ドキュメント多言語化**
+  - [ ] mdBook i18n モジュール
+  - [ ] Crowdin CI 同期
+- [ ] **11.4 エラーメッセージ翻訳**
+  - [ ] 100% キー網羅テスト
+
+### Phase 12: パフォーマンス最適化 & ベンチマーク
+- [ ] **12.1 TPC-C ベンチ**
+  - [ ] Workload Generator 10k WH
+  - [ ] tpmC 計測 & グラフ
+- [ ] **12.2 TPC-DS ベンチ**
+  - [ ] 10TB データロード
+  - [ ] 99 クエリ実行 & 計測
+- [ ] **12.3 TSBS 時系列**
+  - [ ] Write Path 2M rec/s
+  - [ ] Query Latency p95 <5ms
+- [ ] **12.4 プロファイリング & 回帰**
+  - [ ] perf/flamegraph 脚本
+  - [ ] CI で 2% 劣化検出
+- [ ] **12.5 最適化タスク**
+  - [ ] SIMD 演算改善
+  - [ ] アロケータチューニング
+
+### Phase 13: リリース & 移行ツール (追加タスク)
+- [ ] **13.1 Helm Chart GA**
+  - [ ] values.yml パラメータ整理
+  - [ ] Rolling Upgrade 試験
+- [ ] **13.2 移行ツール**
+  - [ ] `pg_dump`/`pg_restore` ラッパー
+  - [ ] MySQL → Serin delta sync
+  - [ ] MongoDB BSON インポータ
+- [ ] **13.3 SBOM & 署名**
+  - [ ] CycloneDX SBOM 自動生成
+  - [ ] Sigstore (cosign) 署名
+- [ ] **13.4 リリースパッケージング**
+  - [ ] クロスコンパイル (musl/gnu)
+  - [ ] Homebrew / Winget formula
+  - [ ] Release Note 自動生成
+- [ ] **13.5 コミュニティリソース**
+  - [ ] ガイド付きチュートリアル
+  - [ ] Issue/PR テンプレート
+  - [ ] 貢献ドキュメント更新 
