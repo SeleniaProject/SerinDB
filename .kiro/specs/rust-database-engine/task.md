@@ -178,10 +178,10 @@
   - [x] GitHub Actions ワークフロー `rust.yml` 作成
   - [x] Build Matrix (linux, windows, macos, arm64)
   - [x] `cargo test`, `clippy`, `fmt` を並列実行
-- [ ] **0.3 コード規約 & Lint**
-  - [ ] `rustfmt.toml` に max_width / edition 設定
-  - [ ] `clippy.toml` で許容ルール定義
-  - [ ] `cargo-deny` でライセンス & セキュリティチェック
+- [x] **0.3 コード規約 & Lint**
+  - [x] `rustfmt.toml` に max_width / edition 設定
+  - [x] `clippy.toml` で許容ルール定義
+  - [x] `cargo-deny` でライセンス & セキュリティチェック
 - [ ] **0.4 ドキュメントサイト基盤**
   - [ ] `mdBook` テンプレート生成
   - [ ] GitHub Pages デプロイ Workflow 作成
