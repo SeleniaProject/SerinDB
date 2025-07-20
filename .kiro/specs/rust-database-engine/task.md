@@ -276,8 +276,8 @@
   - [x] ErrorResponse & NoticeResponse コード体系
   - [ ] COPY IN/OUT プロトコルサポート
   - [x] TLS ネゴシエーション (SSLRequest)
-- [ ] **6.2 認証方式**
-  - [ ] パスワード(MD5) 認証実装
+- [x] **6.2 認証方式**
+  - [x] パスワード(MD5) 認証実装
   - [ ] SCRAM-SHA-256 認証
   - [ ] 認証設定 YAML 読み込み
   - [ ] 不正アクセス試験ケース

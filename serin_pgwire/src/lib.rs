@@ -2,30 +2,34 @@
 //! Supports SSL negation, StartupMessage, Simple Query, and basic Extended Query.
 
 use bytes::{Buf, BytesMut};
+pub mod auth;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::Mutex;
+use md5::{Digest, Md5};
+use crate::auth::{AuthConfig, verify_md5_password};
 
 const SSL_REQUEST_CODE: u32 = 80877103; // 0x04D2162F
 const PROTOCOL_VERSION: u32 = 196608; // 3.0
 
 /// Run a PgWire server on the given address (e.g., "0.0.0.0:5432").
-pub async fn run_server(addr: &str) -> anyhow::Result<()> {
+pub async fn run_server(addr: &str, auth_conf: Arc<AuthConfig>) -> anyhow::Result<()> {
     let listener = TcpListener::bind(addr).await?;
     println!("PgWire server listening on {addr}");
     loop {
         let (socket, _) = listener.accept().await?;
+        let auth = auth_conf.clone();
         tokio::spawn(async move {
-            if let Err(e) = handle_conn(socket).await {
+            if let Err(e) = handle_conn(socket, auth).await {
                 eprintln!("connection error: {e}");
             }
         });
     }
 }
 
-async fn handle_conn(mut socket: TcpStream) -> anyhow::Result<()> {
+async fn handle_conn(mut socket: TcpStream, auth: Arc<AuthConfig>) -> anyhow::Result<()> {
     // Handle SSL negotiation or StartupMessage.
     let mut len_buf = [0u8; 4];
     socket.read_exact(&mut len_buf).await?;
@@ -59,7 +63,27 @@ async fn handle_conn(mut socket: TcpStream) -> anyhow::Result<()> {
         cursor.advance(val_pos + 1);
         params.insert(key, val);
     }
-    // Send AuthenticationOk.
+    // Password authentication (MD5).
+    let user = params.get("user").cloned().unwrap_or_default();
+    let salt = rand::random::<[u8; 4]>();
+    send_auth_md5(&mut socket, &salt).await?;
+    // Read PasswordMessage.
+    let mut type_buf = [0u8; 1];
+    socket.read_exact(&mut type_buf).await?;
+    if type_buf[0] != b'p' {
+        send_error(&mut socket, "FATAL", "28P01", "Password required").await?;
+        return Ok(());
+    }
+    socket.read_exact(&mut len_buf).await?;
+    let plen = u32::from_be_bytes(len_buf) as usize;
+    let mut pbuf = vec![0u8; plen - 4];
+    socket.read_exact(&mut pbuf).await?;
+    let passwd_cstr = extract_cstr(&pbuf)?;
+    let stored_pwd = auth.password(&user).unwrap_or("password");
+    if !verify_md5_password(stored_pwd, &user, &passwd_cstr, &salt) {
+        send_error(&mut socket, "FATAL", "28P01", "Authentication failed").await?;
+        return Ok(());
+    }
     send_auth_ok(&mut socket).await?;
     // ParameterStatus.
     send_param_status(&mut socket, "server_version", "13.0").await?;
@@ -153,6 +177,35 @@ async fn send_auth_ok(socket: &mut TcpStream) -> anyhow::Result<()> {
     msg.extend(&(0u32.to_be_bytes()));
     socket.write_all(&msg).await?;
     Ok(())
+}
+
+async fn send_auth_md5(socket: &mut TcpStream, salt: &[u8; 4]) -> anyhow::Result<()> {
+    socket.write_u8(b'R').await?;
+    socket.write_u32(12u32.to_be()).await?;
+    socket.write_u32(5u32.to_be()).await?; // auth MD5 code
+    socket.write_all(salt).await?;
+    Ok(())
+}
+
+fn md5_hex(data: &[u8]) -> String {
+    let mut hasher = Md5::new();
+    hasher.update(data);
+    format!("{:x}", hasher.finalize())
+}
+
+fn verify_md5_password(user: &str, client_resp: &str, salt: &[u8; 4]) -> bool {
+    // In real system, get user password from catalog. Here we use "password" for all.
+    let stored_pwd = "password";
+    let mut inner = Vec::new();
+    inner.extend_from_slice(stored_pwd.as_bytes());
+    inner.extend_from_slice(user.as_bytes());
+    let hash1 = md5_hex(&inner);
+    let mut outer = Vec::new();
+    outer.extend_from_slice(hash1.as_bytes());
+    outer.extend_from_slice(salt);
+    let hash2 = md5_hex(&outer);
+    let expected = format!("md5{}", hash2);
+    expected == client_resp
 }
 
 async fn send_param_status(socket: &mut TcpStream, key: &str, val: &str) -> anyhow::Result<()> {

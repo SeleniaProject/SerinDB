@@ -1,5 +1,6 @@
 use clap::{Parser, Subcommand};
 use tokio::runtime::Runtime;
+use serin_pgwire::auth::AuthConfig;
 
 /// SerinDB command-line interface (MVP).
 #[derive(Parser)]
@@ -20,6 +21,10 @@ enum Commands {
         /// Listen address (e.g., 0.0.0.0:5432)
         #[arg(long, default_value = "0.0.0.0:5432")]
         listen: String,
+
+        /// Path to YAML auth file.
+        #[arg(long, default_value = "serin_auth.yml")]
+        auth_file: String,
     },
 }
 
@@ -34,11 +39,12 @@ fn main() {
                 println!("FAILED");
             }
         }
-        Some(Commands::Server { listen }) => {
+        Some(Commands::Server { listen, auth_file }) => {
             // Start async runtime manually since main is sync.
             let rt = Runtime::new().unwrap();
             rt.block_on(async {
-                if let Err(e) = serin_pgwire::run_server(&listen).await {
+                let conf = AuthConfig::load(&auth_file).expect("failed to load auth config");
+                if let Err(e) = serin_pgwire::run_server(&listen, conf).await {
                     eprintln!("Server error: {e}");
                 }
             });
