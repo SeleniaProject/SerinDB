@@ -286,8 +286,8 @@
   - [x] Go (`serin-go`) database/sql Driver
   - [x] Java (`serin-jdbc`) JDBC 4.3 Driver
   - [x] Python (`serin-py`) asyncpg ラッパー
-  - [ ] Node.js (`serin-js`) pg ラッパー
-  - [ ] 各言語で CRUD サンプルアプリ
+  - [x] Node.js (`serin-js`) pg ラッパー
+  - [x] 各言語で CRUD サンプルアプリ
 - [ ] **6.4 接続プール & プロキシ**
   - [ ] サーバー側プール（設定: max_idle, max_active）
   - [ ] ステートメントキャッシュ
