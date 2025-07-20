@@ -245,8 +245,8 @@
   - [x] Crash simulation テスト
 
 ### Phase 4: クエリ最適化 & 実行エンジン (MVP)
-- [ ] **4.1 論理プラン生成**
-  - [ ] SELECT/WHERE push-down optimizer pass
+- [x] **4.1 論理プラン生成**
+  - [x] SELECT/WHERE push-down optimizer pass
 - [ ] **4.2 物理プラン決定**
   - [ ] Cost model 関数実装 (CPU/IO)
 - [ ] **4.3 Vectorized Execution**
