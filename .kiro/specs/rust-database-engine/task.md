@@ -231,9 +231,9 @@
   - [x] Mock Storage で上位テスト
 
 ### Phase 3: トランザクションマネージャ
-- [ ] **3.1 MVCC スナップショット**
-  - [ ] `VersionedTuple` 構造体に ts フィールド追加
-  - [ ] Read & Write set 検証テスト
+- [x] **3.1 MVCC スナップショット**
+  - [x] `VersionedTuple` 構造体に ts フィールド追加
+  - [x] Read & Write set 検証テスト
 - [ ] **3.2 ロックマネージャ**
   - [ ] Intention lock table 実装
   - [ ] Deadlock detector (Wait-For Graph BFS)

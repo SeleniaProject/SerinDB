@@ -1,5 +1,5 @@
 [workspace]
-members = ["serindb", "serin_parser", "serinctl", "serin_storage"]
+members = ["serindb", "serin_parser", "serinctl", "serin_storage", "serin_txn"]
 
 [profile.release]
 opt-level = 3
