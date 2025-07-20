@@ -57,6 +57,12 @@ pub enum Token {
     Identifier,
     /// Unrecognised token.
     Error,
+    /// `MATCH` keyword.
+    #[token("MATCH", ignore(ascii_case))]
+    MatchKw,
+    /// `RETURN` keyword.
+    #[token("RETURN", ignore(ascii_case))]
+    ReturnKw,
 }
 
 /// Output of the lexer containing token and span.

@@ -11,6 +11,8 @@ pub enum Statement {
     Update,
     /// `DELETE` statement.
     Delete,
+    /// Cypher-like graph query.
+    GraphQuery(CypherQuery),
 }
 
 /// Very small `SELECT` representation (placeholder for full AST).
@@ -27,4 +29,11 @@ pub enum SelectItem {
     Star,
     /// Numeric literal.
     Number(i64),
+}
+
+/// Simple Cypher-like graph query AST.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct CypherQuery {
+    /// Queried variable name, e.g., `n` in MATCH (n)
+    pub variable: String,
 } 

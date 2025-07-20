@@ -202,9 +202,9 @@
   - [x] Antlr4 grammar 生成スクリプト
   - [x] エラーリカバリ (panic / resume) 実装
   - [x] パーサー fuzz テスト
-- [ ] **1.4 拡張構文 (Cypher, JSON)**
-  - [ ] Cypher grammar 追加
-  - [ ] JSONPath サポート
+- [x] **1.4 拡張構文 (Cypher, JSON)**
+  - [x] Cypher grammar 追加
+  - [x] JSONPath サポート
 - [ ] **1.5 CLI (`serinctl`) MVP**
   - [ ] `rustyline` インタラクティブ Shell
   - [ ] `.serinrc` 設定ファイル読み込み
