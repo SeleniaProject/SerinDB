@@ -257,9 +257,9 @@
   - [x] Hotspot detection
 
 ### Phase 5: インデックス実装
-- [ ] **5.1 B+Tree**
-  - [ ] Split/Merge 操作
-  - [ ] BulkLoad ユーティリティ
+- [x] **5.1 B+Tree**
+  - [x] Split/Merge 操作
+  - [x] BulkLoad ユーティリティ
 - [ ] **5.2 LSM Tree レベル 0-1**
   - [ ] MemTable (skiplist) 実装
   - [ ] SSTable writer/reader
