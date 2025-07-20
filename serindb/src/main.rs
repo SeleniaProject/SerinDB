@@ -2,6 +2,7 @@ use clap::{Parser, Subcommand};
 use tokio::runtime::Runtime;
 use serin_pgwire::auth::AuthConfig;
 use serin_telemetry as telemetry;
+use serin_metrics as metrics;
 
 /// SerinDB command-line interface (MVP).
 #[derive(Parser)]
@@ -31,6 +32,9 @@ enum Commands {
 
 fn main() {
     telemetry::init("serindb").expect("telemetry init");
+    let _ = tokio::runtime::Builder::new_multi_thread().enable_all().build().unwrap().block_on(async {
+        let _ = metrics::serve("0.0.0.0:9644", None).await;
+    });
     let cli = Cli::parse();
 
     match cli.command {

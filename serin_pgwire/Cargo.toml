@@ -19,3 +19,4 @@ serde_yaml = "0.9"
 pbkdf2 = "0.11"
 rand = "0.8" 
 tracing = "0.1" 
+serin_metrics = { path = "../serin_metrics" } 

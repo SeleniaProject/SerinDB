@@ -10,6 +10,7 @@ use md5::{Digest, Md5};
 use crate::auth::{AuthConfig, verify_md5_password};
 use bytes::{Buf, BytesMut};
 use tracing::{info, instrument};
+use serin_metrics::{CONNECTIONS_TOTAL, QUERIES_TOTAL, QUERY_LATENCY_SECS};
 
 const SSL_REQUEST_CODE: u32 = 80877103; // 0x04D2162F
 const PROTOCOL_VERSION: u32 = 196608; // 3.0
@@ -93,6 +94,7 @@ async fn handle_conn(mut socket: TcpStream, auth: Arc<AuthConfig>) -> anyhow::Re
     send_param_status(&mut socket, "client_encoding", "UTF8").await?;
     // ReadyForQuery.
     send_ready(&mut socket).await?;
+    CONNECTIONS_TOTAL.inc();
 
     // State storage for prepared statements / portals.
     let stmts: Arc<Mutex<HashMap<String, String>>> = Arc::new(Mutex::new(HashMap::new()));
@@ -108,9 +110,13 @@ async fn handle_conn(mut socket: TcpStream, auth: Arc<AuthConfig>) -> anyhow::Re
         socket.read_exact(&mut read_buf).await?;
         match msg_type {
             'Q' => {
+                let start = std::time::Instant::now();
                 // Simple Query or COPY.
                 let q = extract_cstr(&read_buf)?;
                 process_simple_query(&mut socket, q).await?;
+                QUERIES_TOTAL.inc();
+                let dur = start.elapsed();
+                QUERY_LATENCY_SECS.observe(dur.as_secs_f64());
             }
             'P' => {
                 // Parse

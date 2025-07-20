@@ -325,10 +325,10 @@
   - [x] スパン計装 (パーサ→ストレージ)
   - [x] gRPC OTLP Exporter
   - [x] サンプリング設定 (率/条件)
-- [ ] **8.2 Prometheus メトリクス**
-  - [ ] Core メトリクス (QPS, latency, hit ratio)
-  - [ ] Histogram バケット最適化
-  - [ ] `/metrics` 認証オプション
+- [x] **8.2 Prometheus メトリクス**
+  - [x] Core メトリクス (QPS, latency, hit ratio)
+  - [x] Histogram バケット最適化
+  - [x] `/metrics` 認証オプション
 - [ ] **8.3 構造化ログ**
   - [ ] JSON Lines + trace_id 埋め込み
   - [ ] ローテーション & 圧縮
@@ -385,47 +385,4 @@
   - [ ] 数値/日付/通貨フォーマッタ
   - [ ] ロケール判定 API
 - [ ] **11.2 Fluent メッセージカタログ**
-  - [ ] `.ftl` ローダ
-  - [ ] フォールバックチェイン
-- [ ] **11.3 ドキュメント多言語化**
-  - [ ] mdBook i18n モジュール
-  - [ ] Crowdin CI 同期
-- [ ] **11.4 エラーメッセージ翻訳**
-  - [ ] 100% キー網羅テスト
-
-### Phase 12: パフォーマンス最適化 & ベンチマーク
-- [ ] **12.1 TPC-C ベンチ**
-  - [ ] Workload Generator 10k WH
-  - [ ] tpmC 計測 & グラフ
-- [ ] **12.2 TPC-DS ベンチ**
-  - [ ] 10TB データロード
-  - [ ] 99 クエリ実行 & 計測
-- [ ] **12.3 TSBS 時系列**
-  - [ ] Write Path 2M rec/s
-  - [ ] Query Latency p95 <5ms
-- [ ] **12.4 プロファイリング & 回帰**
-  - [ ] perf/flamegraph 脚本
-  - [ ] CI で 2% 劣化検出
-- [ ] **12.5 最適化タスク**
-  - [ ] SIMD 演算改善
-  - [ ] アロケータチューニング
-
-### Phase 13: リリース & 移行ツール (追加タスク)
-- [ ] **13.1 Helm Chart GA**
-  - [ ] values.yml パラメータ整理
-  - [ ] Rolling Upgrade 試験
-- [ ] **13.2 移行ツール**
-  - [ ] `pg_dump`/`pg_restore` ラッパー
-  - [ ] MySQL → Serin delta sync
-  - [ ] MongoDB BSON インポータ
-- [ ] **13.3 SBOM & 署名**
-  - [ ] CycloneDX SBOM 自動生成
-  - [ ] Sigstore (cosign) 署名
-- [ ] **13.4 リリースパッケージング**
-  - [ ] クロスコンパイル (musl/gnu)
-  - [ ] Homebrew / Winget formula
-  - [ ] Release Note 自動生成
-- [ ] **13.5 コミュニティリソース**
-  - [ ] ガイド付きチュートリアル
-  - [ ] Issue/PR テンプレート
-  - [ ] 貢献ドキュメント更新 
+  - [ ] `.ftl`
