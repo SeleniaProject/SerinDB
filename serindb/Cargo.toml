@@ -1,0 +1,9 @@
+[package]
+name = "serindb"
+version = "0.1.0"
+edition = "2021"
+authors = ["SeleniaProject <dev@example.com>"]
+description = "Core library for SerinDB database engine."
+license = "Apache-2.0"
+
+[dependencies] 
