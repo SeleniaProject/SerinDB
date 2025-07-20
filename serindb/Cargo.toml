@@ -6,4 +6,9 @@ authors = ["SeleniaProject <dev@example.com>"]
 description = "Core library for SerinDB database engine."
 license = "Apache-2.0"
 
-[dependencies] 
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+
+[[bin]]
+name = "serindb"
+path = "src/main.rs" 

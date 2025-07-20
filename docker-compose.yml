@@ -1,0 +1,7 @@
+version: "3.9"
+services:
+  serindb-dev:
+    build: .
+    image: serindb:dev
+    container_name: serindb-dev
+    command: ["--help"] 

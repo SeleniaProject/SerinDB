@@ -186,10 +186,10 @@
   - [x] `mdBook` テンプレート生成
   - [x] GitHub Pages デプロイ Workflow 作成
   - [x] `design.md` & `requirements.md` を自動取り込み
-- [ ] **0.5 コンテナビルド**
-  - [ ] Multi-stage `Dockerfile` (Alpine)
-  - [ ] `docker-compose.yml` に dev サービス追加
-  - [ ] `docker run serindb --help` テスト
+- [x] **0.5 コンテナビルド**
+  - [x] Multi-stage `Dockerfile` (Alpine)
+  - [x] `docker-compose.yml` に dev サービス追加
+  - [x] `docker run serindb --help` テスト
 
 ### Phase 1: コア言語処理系 (Parser & CLI)
 - [ ] **1.1 Lex/Tokenize**
