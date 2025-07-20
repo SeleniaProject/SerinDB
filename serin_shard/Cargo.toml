@@ -1,0 +1,9 @@
+[package]
+name = "serin_shard"
+version = "0.1.0"
+edition = "2021"
+authors = ["SeleniaProject <dev@example.com>"]
+license = "Apache-2.0"
+
+[dependencies]
+async-trait = "0.1" 

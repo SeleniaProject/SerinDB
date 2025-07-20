@@ -1,4 +1,4 @@
-use clap::{Args, Parser};
+use clap::{Args, Parser, Subcommand};
 use directories::BaseDirs;
 use rustyline::{error::ReadlineError, Editor};
 use serin_parser::parse;
@@ -27,6 +27,17 @@ struct Options {
     config: Option<PathBuf>,
 }
 
+#[derive(Subcommand)]
+enum Commands {
+    /// Shard management commands.
+    Shard {
+        #[arg(long)]
+        key: String,
+        #[arg(long, default_value_t = 4)]
+        shards: u64,
+    },
+}
+
 fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
     let config_path = cli
@@ -53,6 +64,16 @@ fn main() -> anyhow::Result<()> {
             }
         }
         return Ok(());
+    }
+
+    match cli.command {
+        Some(Commands::Shard { key, shards }) => {
+            let router = serin_shard::HashRouter::new(shards);
+            let rt = tokio::runtime::Runtime::new()?;
+            let id = rt.block_on(router.shard_for_key(&key));
+            println!("shard_id={}", id);
+        }
+        None => {}
     }
 
     interactive_shell();

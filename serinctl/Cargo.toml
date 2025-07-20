@@ -11,3 +11,4 @@ rustyline = "12"
 serin_parser = { path = "../serin_parser" }
 directories = "5"
 thiserror = "1" 
+serin_shard = { path = "../serin_shard" } 
