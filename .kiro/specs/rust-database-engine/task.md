@@ -283,7 +283,7 @@
   - [x] 不正アクセス試験ケース
 - [x] **6.3 ドライバ SDK**
   - [x] Rust (`serin-rs`) tokio-postgres ラッパー
-  - [ ] Go (`serin-go`) database/sql Driver
+  - [x] Go (`serin-go`) database/sql Driver
   - [ ] Java (`serin-jdbc`) JDBC 4.3 Driver
   - [ ] Python (`serin-py`) asyncpg ラッパー
   - [ ] Node.js (`serin-js`) pg ラッパー
