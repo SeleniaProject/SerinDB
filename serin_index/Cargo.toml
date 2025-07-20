@@ -9,3 +9,4 @@ license = "Apache-2.0"
 serde = { version = "1.0", features = ["derive"] }
 bitvec = "1"
 murmur3 = "0.5" 
+serin_json = { path = "../serin_json" } 

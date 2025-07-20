@@ -129,6 +129,7 @@ impl BPlusTree {
 
 pub mod rtree;
 pub mod bloom;
+pub mod json_gin;
 
 #[cfg(test)]
 mod tests {
