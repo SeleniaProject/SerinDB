@@ -333,10 +333,10 @@
   - [x] JSON Lines + trace_id 埋め込み
   - [x] ローテーション & 圧縮
   - [x] 動的ログレベル変更 API
-- [ ] **8.4 ダッシュボード & アラート**
-  - [ ] Grafana ダッシュボードテンプレート
-  - [ ] Alertmanager ルール
-  - [ ] SLO 定義 (p99 <10ms 等)
+- [x] **8.4 ダッシュボード & アラート**
+  - [x] Grafana ダッシュボードテンプレート
+  - [x] Alertmanager ルール
+  - [x] SLO 定義 (p99 <10ms 等)
 - [ ] **8.5 serinctl 運用コマンド**
   - [ ] `backup`, `restore`, `analyze`, `health`
   - [ ] `config set` ホットリロード

@@ -1,0 +1,20 @@
+groups:
+  - name: serindb.rules
+    rules:
+      - alert: SerinDBHighLatency
+        expr: histogram_quantile(0.99, rate(serin_query_latency_seconds_bucket[5m])) > 0.2
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High query latency on SerinDB"
+          description: "p99 latency exceeds 200ms for 2m"
+
+      - alert: SerinDBNoQueries
+        expr: rate(serin_queries_total[5m]) == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "SerinDB not processing queries"
+          description: "No queries observed in last 5 minutes" 

@@ -1,0 +1,35 @@
+{
+  "id": null,
+  "title": "SerinDB Overview",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "10s",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "Query Throughput (QPS)",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "rate(serin_queries_total[1m])",
+          "legendFormat": "QPS",
+          "interval": ""
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 }
+    },
+    {
+      "type": "graph",
+      "title": "Query Latency p95 (ms)",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(serin_query_latency_seconds_bucket[1m])) * 1000",
+          "legendFormat": "p95",
+          "interval": ""
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 }
+    }
+  ]
+} 
