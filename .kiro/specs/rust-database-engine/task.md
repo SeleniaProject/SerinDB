@@ -281,8 +281,8 @@
   - [x] SCRAM-SHA-256 認証
   - [x] 認証設定 YAML 読み込み
   - [x] 不正アクセス試験ケース
-- [ ] **6.3 ドライバ SDK**
-  - [ ] Rust (`serin-rs`) tokio-postgres ラッパー
+- [x] **6.3 ドライバ SDK**
+  - [x] Rust (`serin-rs`) tokio-postgres ラッパー
   - [ ] Go (`serin-go`) database/sql Driver
   - [ ] Java (`serin-jdbc`) JDBC 4.3 Driver
   - [ ] Python (`serin-py`) asyncpg ラッパー
