@@ -7,4 +7,5 @@ license = "Apache-2.0"
 
 [dependencies]
 crc32c = "0.6"
-serde = { version = "1.0", features = ["derive"] } 
+serde = { version = "1.0", features = ["derive"] }
+time = { version = "0.3", features = ["formatting"] } 

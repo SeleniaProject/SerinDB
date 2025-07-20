@@ -219,10 +219,10 @@
   - [x] A1in/A1out/Am リスト構造
   - [x] CLOCK ハンド victim 選定ロジック
   - [x] NUMA-aware アロケータ検証
-- [ ] **2.3 WAL Writer**
-  - [ ] Write-Ahead Logging バイナリフォーマット
-  - [ ] グループコミット & fsync バッチ
-  - [ ] クラッシュリカバリユニットテスト
+- [x] **2.3 WAL Writer**
+  - [x] Write-Ahead Logging バイナリフォーマット
+  - [x] グループコミット & fsync バッチ
+  - [x] クラッシュリカバリユニットテスト
 - [ ] **2.4 Disk I/O (io_uring)**
   - [ ] `tokio-uring` ベース async pread/pwrite
   - [ ] IOPS ベンチツール作成
