@@ -284,8 +284,8 @@
 - [x] **6.3 ドライバ SDK**
   - [x] Rust (`serin-rs`) tokio-postgres ラッパー
   - [x] Go (`serin-go`) database/sql Driver
-  - [ ] Java (`serin-jdbc`) JDBC 4.3 Driver
-  - [ ] Python (`serin-py`) asyncpg ラッパー
+  - [x] Java (`serin-jdbc`) JDBC 4.3 Driver
+  - [x] Python (`serin-py`) asyncpg ラッパー
   - [ ] Node.js (`serin-js`) pg ラッパー
   - [ ] 各言語で CRUD サンプルアプリ
 - [ ] **6.4 接続プール & プロキシ**
