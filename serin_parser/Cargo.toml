@@ -1,0 +1,11 @@
+[package]
+name = "serin_parser"
+version = "0.1.0"
+edition = "2021"
+authors = ["SeleniaProject <dev@example.com>"]
+license = "Apache-2.0"
+
+[dependencies]
+logos = "0.13"
+serde = { version = "1.0", features = ["derive"] }
+thiserror = "1" 

@@ -192,12 +192,12 @@
   - [x] `docker run serindb --help` テスト
 
 ### Phase 1: コア言語処理系 (Parser & CLI)
-- [ ] **1.1 Lex/Tokenize**
-  - [ ] `logos` ベース lexer 実装
-  - [ ] SQL92 全キーワードユニットテスト
-- [ ] **1.2 AST 定義**
-  - [ ] `Expr`, `Stmt`, `DataType` Enum 設計
-  - [ ] Serde でデバッグ表示実装
+- [x] **1.1 Lex/Tokenize**
+  - [x] `logos` ベース lexer 実装
+  - [x] SQL92 全キーワードユニットテスト
+- [x] **1.2 AST 定義**
+  - [x] `Expr`, `Stmt`, `DataType` Enum 設計
+  - [x] Serde でデバッグ表示実装
 - [ ] **1.3 SQL Parser**
   - [ ] Antlr4 grammar 生成スクリプト
   - [ ] エラーリカバリ (panic / resume) 実装
