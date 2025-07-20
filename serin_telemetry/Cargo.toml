@@ -7,6 +7,6 @@ edition = "2021"
 opentelemetry = { version = "0.21" }
 opentelemetry-otlp = { version = "0.12", features = ["tonic", "tls"] }
 tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter", "registry"] }
+tracing-subscriber = { version = "0.3.19", features = ["fmt", "env-filter", "registry"] }
 anyhow = "1" 
 tracing-opentelemetry = "0.22" 
